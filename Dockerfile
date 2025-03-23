@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy JAR file
 COPY target/EmployeeService-0.0.1-SNAPSHOT.jar app.jar
 
-# Expose port 8085
-EXPOSE 8085
+# Expose the default port (optional, Cloud Run ignores this)
+EXPOSE 8080
 
-# Start the Spring Boot application
+# Start the Spring Boot application with a dynamic port
 CMD ["java", "-jar", "app.jar"]
