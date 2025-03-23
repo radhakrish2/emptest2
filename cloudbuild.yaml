@@ -1,52 +1,20 @@
 steps:
-  - name: gcr.io/cloud-builders/docker
+  - name: 'maven:3.6.0-jdk-8'
+    args: ['mvn', 'clean', 'install']
+    dir: '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
     args:
-      - build
-      - '--no-cache'
+      - 'build'
       - '-t'
-      - >-
-        $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
-      - .
-      - '-f'
-      - Dockerfile
-    id: Build
-  - name: gcr.io/cloud-builders/docker
+      - 'gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/gcloud'
     args:
-      - push
-      - >-
-        $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
-    id: Push
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
-    args:
-      - run
-      - services
-      - update
-      - $_SERVICE_NAME
-      - '--platform=managed'
-      - >-
-        --image=$_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
-      - >-
-        --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
-      - '--region=$_DEPLOY_REGION'
-      - '--quiet'
-    id: Deploy
-    entrypoint: gcloud
+      - 'app'
+      - 'deploy'
+    dir: '.'
+
 images:
-  - >-
-    $_AR_HOSTNAME/$_AR_PROJECT_ID/$_AR_REPOSITORY/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
-options:
-  substitutionOption: ALLOW_LOOSE
-  logging: CLOUD_LOGGING_ONLY
-substitutions:
-  _TRIGGER_ID: 25465155-aebe-4a55-be55-a38757eb1ce7
-  _AR_REPOSITORY: cloud-run-source-deploy
-  _AR_PROJECT_ID: rkgcpproject
-  _PLATFORM: managed
-  _SERVICE_NAME: emptest2
-  _DEPLOY_REGION: us-central1
-  _AR_HOSTNAME: us-central1-docker.pkg.dev
-tags:
-  - gcp-cloud-build-deploy-cloud-run
-  - gcp-cloud-build-deploy-cloud-run-managed
-  - emptest2
-logsBucket: 'gs://rkgcpproject_cloudbuild/'
+  - 'gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA'
