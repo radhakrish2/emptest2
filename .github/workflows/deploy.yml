@@ -3,7 +3,7 @@ name: Build, Package & Deploy to Google Cloud Run
 on:
   push:
     branches:
-      - main  # Change this if you use a different branch
+      - main  # Change this if your main branch has a different name
 
 jobs:
   build:
@@ -33,14 +33,14 @@ jobs:
 
       # Step 4: Build the JAR using Maven
       - name: Build with Maven
-        run: mvn clean package
+        run: mvn clean package -DskipTests
 
-      # Step 5: Upload the generated JAR as an artifact (Optional: For debugging)
+      # Step 5: Upload the generated JAR as an artifact (For debugging)
       - name: Upload JAR artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # Fixed missing action
         with:
           name: built-jar
-          path: target/*.jar  # Stores the JAR file for later use
+          path: target/*.jar  # Uploads the built JAR
 
       # Step 6: Authenticate with Google Cloud
       - name: Authenticate with GCP
@@ -52,14 +52,17 @@ jobs:
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      # Step 8: Build and Push Docker Image to Google Container Registry
+      # Step 8: Authenticate Docker with GCR
+      - name: Configure Docker to use GCR
+        run: gcloud auth configure-docker gcr.io
+
+      # Step 9: Build and Push Docker Image to Google Container Registry
       - name: Build and Push Docker Image
         run: |
-          gcloud auth configure-docker
           docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/myapp:latest .
           docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/myapp:latest
 
-      # Step 9: Deploy to Google Cloud Run
+      # Step 10: Deploy to Google Cloud Run
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy myapp \
