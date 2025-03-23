@@ -11,7 +11,7 @@ public class EmployeeController {
 	@GetMapping
 	public String getMessage(String[] args)
 	{
-		return "welcome to spring";
+		return "welcome to spring boot";
 	}
 	
 }
