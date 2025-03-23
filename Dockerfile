@@ -1,14 +1,11 @@
-# Use Java 17 JRE image
-FROM eclipse-temurin:17-jre-jammy
+# Use official openjdk base image
+FROM openjdk:17-jdk-slim as build
 
-# Set working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy JAR file
+# Copy the maven build artifact (assuming you're using Maven)
 COPY target/*.jar app.jar
 
-# Expose the default port (optional, Cloud Run ignores this)
-EXPOSE 8080
-
-# Start the Spring Boot application with a dynamic port
-CMD ["java", "-jar", "app.jar", "--server.port=${PORT}"]
+# Command to run the application
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
