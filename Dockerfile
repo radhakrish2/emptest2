@@ -1,9 +1,8 @@
 # Use a minimal JRE image
 FROM eclipse-temurin:17-jre-jammy
 
-# Set the working directory
+# Set the working directory .
 WORKDIR /app
-
 # Copy the JAR file from the target directory
 COPY target/*.jar app.jar
 
