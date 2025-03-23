@@ -1,14 +1,20 @@
-# Use Eclipse Temurin JDK 17 (Jammy) as base image
+# syntax=docker/dockerfile:1
+
 FROM eclipse-temurin:17-jdk-jammy
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the application JAR file into the container
-COPY target/EmployeeService-0.0.1-SNAPSHOT.jar app.jar
+COPY .mvn/ .mvn
+COPY mvnw pom.xml ./
 
-# Expose the port the application runs on
-EXPOSE 8080
+RUN chmod +x ./mvnw
 
-# Command to run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# 🟠 Converting the mvnw line endings during build (if you don’t change line endings of the mvnw file)
+RUN apt-get update && apt-get install -y dos2unix
+RUN dos2unix ./mvnw
+
+RUN ./mvnw dependency:resolve
+
+COPY src ./src
+
+CMD ["./mvnw", "spring-boot:run"]
