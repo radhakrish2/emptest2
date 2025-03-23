@@ -22,3 +22,6 @@ images:
   - 'gcr.io/$PROJECT_ID/my-app:$SHORT_SHA'
 
 timeout: 900s
+
+logsBucket: 'gs://rkgcpproject_cloudbuild/'
+
