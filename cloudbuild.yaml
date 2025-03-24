@@ -1,34 +1,25 @@
-substitutions:
-  _PROJECT_ID: "rkgcpproject"
-  _SERVICE_NAME: "emptest2"
-  _JAR_FILE: "target/EmployeeService-0.0.1-SNAPSHOT.jar"
-  _REGION: "us-central1"
-
 steps:
-  # Step 1: Build the JAR file
+  # 1. Build the JAR file
   - name: 'gcr.io/cloud-builders/mvn'
     args: ['clean', 'package']
-
-  # Step 2: Build a Docker image with the JAR file
+  
+  # 2. Build Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: [
-      'build', '-t', 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}',
-      '--build-arg', 'JAR_FILE=${_JAR_FILE}', '.'
-    ]
-
-  # Step 3: Push Docker image to Google Container Registry
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/my-spring-app', '.']
+  
+  # 3. Push the image to Google Container Registry (GCR) or Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}']
+    args: ['push', 'gcr.io/$PROJECT_ID/my-spring-app']
 
-  # Step 4: Deploy to Cloud Run
+  # 4. Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
     args: [
-      'run', 'deploy', '${_SERVICE_NAME}',
-      '--image', 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}',
-      '--region', '${_REGION}',
+      'gcloud', 'run', 'deploy', 'my-spring-app',
+      '--image', 'gcr.io/$PROJECT_ID/my-spring-app',
       '--platform', 'managed',
+      '--region', 'us-central1',
       '--allow-unauthenticated'
     ]
 
-timeout: 900s
+images:
+  - 'gcr.io/$PROJECT_ID/my-spring-app'
