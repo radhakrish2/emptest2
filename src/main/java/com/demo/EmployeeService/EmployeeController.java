@@ -11,7 +11,8 @@ public class EmployeeController {
 	@GetMapping
 	public String getMessage(String[] args)
 	{
-		return "Hello rk chellan.";
+		return "Welcome to Google cloud";
 	}
+	
 	
 }
